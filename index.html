@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechDox.io</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      background-color: #fffafa; /* Metallic gray background */
+    }
+    .card, .flip-card, .bg-white {
+      box-shadow: 0 4px 20px rgba(22, 136, 208, 0.5); /* Sky blue faded shadow */
+    }
+    .doc-item {
+      
+      opacity: 0; /* Start hidden */
+      transform: translateY(20px); /* Start slightly below */
+      /* Added box-shadow effect */
+    }
+    .doc-item:hover {
+      box-shadow: 0 4px 20px rgba(22, 136, 208, 0.5); /* Box shadow on hover */
+      /* Add moving-shadow class effect on hover */
+      animation: shadow 2s ease infinite; /* Apply the shadow animation */
+    }
+    .doc-item.visible {
+      opacity: 1; /* Fade in */
+      transform: translateY(0); /* Move to original position */
+    }
+    .button {
+      background-color: #3b82f6; /* Blue background for buttons */
+      color: rgb(255, 255, 255); /* White text */
+      padding: 10px 20px; /* Padding for buttons */
+      border-radius: 5px; /* Rounded corners */
+      border: none; /* No border */
+      cursor: pointer; /* Pointer cursor */
+    }
+    .button:hover {
+      background-color: #2563eb; /* Darker blue on hover */
+    }
+    .contribution-card {
+      transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transition */
+      opacity: 0; /* Start hidden */
+      transform: translateY(10px); /* Start slightly below */
+    }
+    .contribution-card.visible {
+      opacity: 1; /* Fade in */
+      transform: translateY(0); /* Move to original position */
+    }
+    .flip-card {
+      background-color: transparent;
+      width: 100%;
+      height: auto; /* Adjust height as needed */
+      perspective: 1000px; /* Perspective for 3D effect */
+    }
+    .flip-card-inner {
+      /* position: relative; */
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d; /* Preserve 3D effect */
+    }
+    .flip-card:hover .flip-card-inner,
+    .flip-card:focus .flip-card-inner {
+      transform: rotateY(180deg); /* Flip effect */
+    }
+    .flip-card-front,
+    .flip-card-back {
+      /* position: relative; */
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden; /* Hide back side when facing away */
+    }
+    .flip-card-back {
+      transform: rotateY(90deg); 
+        }
+    @keyframes shadow {
+      0% {
+        box-shadow: 0 0 10px rgba(22, 136, 208, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(22, 136, 208, 0.7);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(22, 136, 208, 0.5);
+      }
+    }
+
+    .moving-shadow {
+      animation: shadow 2s ease infinite; /* Apply the shadow animation */
+    }
+  </style>
+</head>
+<body class="bg-gray-900 relative">
+  <!-- Background Image -->
+  <div class="absolute top-0 left-0 w-full h-full bg-cover bg-center" style="background-image: url('https://wallpaperaccess.com/full/3853246.jpg');">
+    <div class="bg-black opacity-20 w-full h-full"></div> <!-- Fade overlay -->
+  </div>
+
+  <!-- Container for search page -->
+  <div class="container mx-auto p-8 relative z-10">
+    <!-- Header Section -->
+    <header class="flex items-center mb-12 h-50">
+      <img src="https://th.bing.com/th/id/OIP.vwsUjwOsjAAubNRYYL45uAHaH9?w=184&h=198&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="Logo" class="w-16 h-16 rounded-full mr-4 filter grayscale" style="filter: grayscale(100%); opacity: 0.6;"> <!-- Circular logo on the left -->
+      <div class="text-center flex-1"> <!-- Center the text -->
+        <h1 id="typewriter" class="text-4xl font-extrabold text-red-500"></h1>
+        <p class="text-xl text-white mt-4">Find the latest documentation for various tech stacks and frameworks</p>
+      </div>
+    </header>
+
+    <!-- Search Bar Section -->
+    <div class="flex justify-center mb-10 mt-12  text-blue-400 text-xl ">
+      <input type="text" id="searchInput" class="w-full max-w-xl p-4 border-2 border-blue-500  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-black" 
+             placeholder="Search for documentation..." oninput="filterDocs()">
+    </div>
+
+    <!-- Docs List: This will dynamically display filtered documentation results -->
+    <div id="docsList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <!-- Example Docs (These will be displayed and filtered) -->
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://reactjs.org/docs/getting-started.html" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">React.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-1">Learn React, a JavaScript library for building user interfaces with a component-based architecture.</p>
+          <button onclick="toggleDescription('desc-1')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://vuejs.org/v2/guide/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Vue.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-2">Explore Vue.js, a progressive JavaScript framework for building UIs and single-page applications.</p>
+          <button onclick="toggleDescription('desc-2')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://nodejs.org/en/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Node.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-3">Learn about Node.js, a JavaScript runtime built on Chrome's V8 engine.</p>
+          <button onclick="toggleDescription('desc-3')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://expressjs.com/en/starter/installing.html" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Express.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-4">Express.js is a fast, unopinionated, minimalist web framework for Node.js.</p>
+          <button onclick="toggleDescription('desc-4')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.mongodb.com/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">MongoDB Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-5">MongoDB is a NoSQL database program that uses a document-oriented data model.</p>
+          <button onclick="toggleDescription('desc-5')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <!-- Additional Documentation Items -->
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://flutter.dev/docs" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Flutter Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-6">Flutter is an open-source UI software development toolkit created by Google.</p>
+          <button onclick="toggleDescription('desc-6')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.djangoproject.com/start/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Django Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-7">Django is a high-level Python web framework that encourages rapid development.</p>
+          <button onclick="toggleDescription('desc-7')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.ruby-lang.org/en/documentation/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Ruby Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-8">Ruby is a dynamic, open-source programming language with a focus on simplicity and productivity.</p>
+          <button onclick="toggleDescription('desc-8')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.php.net/docs.php" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">PHP Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-9">PHP is a popular general-purpose scripting language that is especially suited to web development.</p>
+          <button onclick="toggleDescription('desc-9')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <!-- Next.js Documentation -->
+      <div class="doc-item bg-black  bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://nextjs.org/docs" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Next.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-10">Next.js is a React framework that enables functionality such as server-side rendering.</p>
+          <button onclick="toggleDescription('desc-10')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://docs.docker.com/get-started/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Docker Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-11">Docker is a platform for developing, shipping, and running applications in containers.</p>
+          <button onclick="toggleDescription('desc-11')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://svelte.dev/docs" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Svelte Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-12">Svelte is a modern JavaScript framework for building user interfaces.</p>
+          <button onclick="toggleDescription('desc-12')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">CSS Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-13">CSS is a stylesheet language used for describing the presentation of a document written in HTML or XML.</p>
+          <button onclick="toggleDescription('desc-13')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">HTML Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-14">HTML is the standard markup language for creating web pages.</p>
+          <button onclick="toggleDescription('desc-14')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://getbootstrap.com/docs" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Bootstrap Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-15">Bootstrap is a popular front-end framework for developing responsive and mobile-first websites.</p>
+          <button onclick="toggleDescription('desc-15')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <!-- Additional Documentation Items (hidden initially) -->
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400 hidden">
+        <a href="https://reactjs.org/docs/getting-started.html" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">React.js Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-1">Learn React, a JavaScript library for building user interfaces with a component-based architecture.</p>
+          <button onclick="toggleDescription('desc-1')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <!-- ... other documentation cards ... -->
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://kubernetes.io/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Kubernetes Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-k8s">Learn about Kubernetes, an open-source system for automating the deployment, scaling, and management of containerized applications.</p>
+          <button onclick="toggleDescription('desc-k8s')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://git-scm.com/doc" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Git Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-git">Explore Git, a distributed version control system for tracking changes in source code during software development.</p>
+          <button onclick="toggleDescription('desc-git')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.jenkins.io/doc/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Jenkins Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-jenkins">Learn about Jenkins, an open-source automation server that enables developers to build, test, and deploy their software.</p>
+          <button onclick="toggleDescription('desc-jenkins')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.terraform.io/docs/index.html" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Terraform Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-terraform">Explore Terraform, an open-source infrastructure as code software tool that provides a consistent CLI workflow to manage hundreds of cloud services.</p>
+          <button onclick="toggleDescription('desc-terraform')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://docs.ansible.com/ansible/latest/index.html" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Ansible Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-ansible">Learn about Ansible, an open-source automation tool for software provisioning, configuration management, and application deployment.</p>
+          <button onclick="toggleDescription('desc-ansible')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://owasp.org/www-project-top-ten/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">OWASP Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-owasp">Learn about OWASP, a nonprofit organization focused on improving the security of software.</p>
+          <button onclick="toggleDescription('desc-owasp')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.cisecurity.org/controls/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">CIS Controls Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-cis">Explore the CIS Controls, a set of best practices for securing IT systems and data.</p>
+          <button onclick="toggleDescription('desc-cis')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.kali.org/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Kali Linux Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-kali">Learn about Kali Linux, a Debian-based distribution aimed at advanced Penetration Testing and Security Auditing.</p>
+          <button onclick="toggleDescription('desc-kali')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.nist.gov/cyberframework" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">NIST Cybersecurity Framework</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-nist">Explore the NIST Cybersecurity Framework, a policy framework of computer security guidance for how private sector organizations can assess and improve their ability to prevent, detect, and respond to cyber attacks.</p>
+          <button onclick="toggleDescription('desc-nist')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.wireshark.org/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Wireshark Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-wireshark">Learn about Wireshark, a network protocol analyzer that lets you capture and interactively browse the traffic running on a computer network.</p>
+          <button onclick="toggleDescription('desc-wireshark')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://portswigger.net/burp" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Burp Suite Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-burp">Explore Burp Suite, a popular platform for web application security testing.</p>
+          <button onclick="toggleDescription('desc-burp')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.metasploit.com/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Metasploit Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-metasploit">Learn about Metasploit, a penetration testing framework that helps security professionals find and exploit vulnerabilities.</p>
+          <button onclick="toggleDescription('desc-metasploit')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://owasp.org/www-project-zap/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">OWASP ZAP Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-zap">Explore OWASP ZAP, an open-source web application security scanner.</p>
+          <button onclick="toggleDescription('desc-zap')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://graphql.org/learn/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">GraphQL Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-graphql">Learn about GraphQL, a query language for your API and a server-side runtime for executing those queries.</p>
+          <button onclick="toggleDescription('desc-graphql')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://web3js.readthedocs.io/en/v1.5.2/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Web3 Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-web3">Explore Web3, a collection of libraries that allow you to interact with a local or remote Ethereum node.</p>
+          <button onclick="toggleDescription('desc-web3')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://kafka.apache.org/documentation/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Apache Kafka Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-kafka">Learn about Apache Kafka, a distributed event streaming platform capable of handling trillions of events a day.</p>
+          <button onclick="toggleDescription('desc-kafka')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+      <div class="doc-item bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 h-full border border-blue-400">
+        <a href="https://www.serverless.com/framework/docs/" class="block">
+          <h2 class="text-2xl font-semibold text-blue-600">Serverless Framework Documentation</h2>
+          <p class="text-gray-100 mt-2 line-clamp-3" id="desc-serverless">Explore the Serverless Framework, a toolkit for deploying and operating serverless architectures.</p>
+          <button onclick="toggleDescription('desc-serverless')" class="button mt-2">See More</button>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- View All Docs Button -->
+    <div class="text-center mt-4">
+      <button id="viewAllDocs" class="button" onclick="viewAllDocs()">View All Docs</button>
+      <button id="viewLessDocs" class="button hidden" onclick="viewLessDocs()">View Less</button>
+    </div>
+
+    <!-- Page Counter -->
+    <div id="pageCounter" class="text-center mt-2 text-white">
+      Total Documentation Items: <span id="totalCount">0</span>
+    </div>
+
+    <!-- Divider Section -->
+    <div class="my-8 border-t border-gray-300"></div>
+
+    <!-- Our Aim Section -->
+    <section class="h-auto p-5 mt-12 ">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Our Aim Card -->
+        <div class="card bg-black bg-opacity-30 backdrop-blur-lg p-3 rounded-xl moving-shadow w-full h-auto">
+          <h2 class="text-4xl font-bold text-red-400">Our Aim</h2>
+          <p class="text-lg text-gray-200 mt-4">Our aim is to provide a one-stop platform where developers and tech enthusiasts can easily access organized documentation on various tech stacks like Frontend, Backend, Databases, and DevOps, helping users quickly find the resources they need to learn and grow their skills
+            .</p>
+        </div>
+
+        <!-- Additional Section (Placeholder) -->
+        <div class="bg-black bg-opacity-30 backdrop-blur-lg p-3 rounded-lg card">
+          <h2 class="text-4xl font-bold text-red-400"> About Us</h2>
+          <p class="text-lg text-gray-100 mt-4">In the future, our mission is to build a one-stop platform where tech enthusiasts and developers can easily access organized documentation 📚 on a wide range of tech stacks, including Frontend, Backend, Databases, and DevOps 🌐. We strive to make learning faster and more efficient, empowering users to find the resources they need to grow their skills 💡. Whether you're just starting out or enhancing your expertise, we'll be here to support your learning journey and help you stay ahead in the tech world! 🌱
+            
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="my-5 border-t border-gray-200"></div>
+    <!-- Contribution Section in Card Format -->
+    <section class="mt-12 p-5 border-gray-200 ">
+      <div class="contribution-card bg-black bg-opacity-30 backdrop-blur-lg p-6 rounded-lg card hover:shadow-xl transition duration-100 w-full max-w-full mx-auto moving-shadow ">
+        <h1 class="text-3xl md:text-4xl font-bold text-red-400 mb-4">Contributing to TechDox.io</h1>
+        <p class="text-base md:text-lg text-gray-200 mb-6">Thank you for considering contributing to [Your Project Name]! We appreciate your help in making this project better. Please follow the guidelines below to ensure a smooth contribution process.</p>
+
+        <h2 class="text-2xl font-semibold text-blue-400 mb-2">How to Contribute</h2>
+
+        <h3 class="text-xl font-semibold text-green-300 mt-4">Reporting Issues</h3>
+        <p class="text-gray-200 mb-4">If you find a bug or have a feature request, please open an issue in the <a href="https://github.com/abhishek252003/TechDox.io/issues" class="text-red-500 font-bold">issue tracker</a>. Be sure to include as much detail as possible, including:</p>
+        <ul class="list-disc list-inside mb-4 text-gray-200">
+          <li>A clear description of the issue or feature request</li>
+          <li>Steps to reproduce the issue (if applicable)</li>
+          <li>Any relevant screenshots or code snippets</li>
+        </ul>
+
+        <h3 class="text-xl font-semibold text-green-300 mt-4">Submitting Code</h3>
+        <ol class="list-decimal list-inside mb-4">
+          <li class="text-gray-200"><strong>Fork the Repository:</strong> Click the "Fork" button at the top right of the repository page to create your own copy of the repository.</li>
+          <li class="text-gray-200"><strong>Clone Your Fork:</strong> Clone your forked repository to your local machine:
+            <pre class="bg-gray-700 p-2 rounded overflow-x-auto"><code class="text-yellow-500 break-all">git clone https://github.com/abhishek252003/TechDox.io.git</code></pre>
+          </li>
+          <li class="text-gray-200"><strong>Create a New Branch:</strong> Create a new branch for your feature or bug fix:
+            <pre class="bg-gray-700 p-2 rounded"><code class="text-yellow-500">git checkout -b my-feature-branch</code></pre>
+          </li>
+          <li class="text-gray-200"><strong>Make Your Changes:</strong> Make your changes in your local repository.</li>
+          <li class="text-gray-200"><strong>Commit Your Changes:</strong> Commit your changes with a clear and descriptive commit message:
+            <pre class="bg-gray-700 p-2 rounded"><code class="text-yellow-500">git commit -m "Add a new feature"</code></pre>
+          </li>
+          <li class="text-gray-200"><strong>Push to Your Fork:</strong> Push your changes to your forked repository:
+            <pre class="bg-gray-700 p-2 rounded"><code class="text-yellow-500">git push origin my-feature-branch</code></pre>
+          </li>
+          <li class="text-gray-200"><strong>Create a Pull Request:</strong> Go to the original repository where you want to contribute and click on the "Pull Requests" tab. Click the "New Pull Request" button and select your branch. Provide a description of your changes and submit the pull request.</li>
+        </ol>
+
+        <h3 class="text-xl font-semibold text-green-500 mt-4">Code of Conduct</h3>
+        <p class="text-yellow-300 mb-4">Please adhere to the <a href="CODE_OF_CONDUCT.md" class="text-red-500 underline">Code of Conduct</a> in all interactions related to this project.</p>
+
+        <h3 class="text-xl font-semibold text-red-800 mt-4">Additional Resources</h3>
+        <ul class="list-disc list-inside mb-4 text-white">
+          <li><a href="https://guides.github.com/introduction/flow/" class="text-green-500">GitHub Flow</a></li>
+          <li><a href="https://opensource.guide/how-to-contribute/" class="text-green-500">How to Contribute to Open Source</a></li>
+        </ul>
+        <div class="mt-6 text-center">
+          <p class="text-lg text-gray-200">If you find this project helpful, please consider giving it a star on GitHub!</p>
+          <a href="https://github.com/abhishek252003/TechDox.io" class="mt-2 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">⭐ Star this Repo</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer Section -->
+  <footer class="bg-gray-800 text-white py-4 mt-12 relative z-10">
+    <div class="container mx-auto text-center">
+      <p class="mb-2">Connect with us:</p>
+      <a href="https://www.linkedin.com/in/abhishek-kumar-chaurasia-28305525a/" class="text-blue-400 hover:underline mx-2">
+        <i class="fab fa-linkedin fa-lg"></i>
+      </a>
+      <a href="https://github.com/abhishek-kumar-chaurasia-28305525a" class="text-blue-400 hover:underline mx-2">
+        <i class="fab fa-github fa-lg"></i>
+      </a>
+      <p class="mt-4">© 2024 TechDox.io. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Real-time search functionality -->
+  <script>
+    function filterDocs() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const docs = document.querySelectorAll('.doc-item');
+
+      docs.forEach(doc => {
+        const title = doc.querySelector('h2').textContent.toLowerCase();
+        const description = doc.querySelector('p').textContent.toLowerCase();
+
+        // Show the document if title or description includes the search query
+        if (title.includes(query) || description.includes(query)) {
+          doc.style.display = 'block';
+        } else {
+          doc.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleDescription(id) {
+      const description = document.getElementById(id);
+      const button = description.nextElementSibling;
+
+      // Toggle the visibility of the full description
+      if (description.classList.contains("line-clamp-3")) {
+        description.classList.remove("line-clamp-3");
+        button.textContent = "See Less";
+      } else {
+        description.classList.add("line-clamp-3");
+        button.textContent = "See More";
+      }
+    }
+
+    // Intersection Observer to add animation class with delay
+    const docItems = document.querySelectorAll('.doc-item');
+    const contributionCard = document.querySelector('.contribution-card');
+
+    const observerOptions = {
+      root: null, // Use the viewport as the root
+      threshold: 0.1 // Trigger when 10% of the item is visible
+    };
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          // Add a delay based on the index of the item, except for the contribution card
+          if (entry.target !== contributionCard) {
+            entry.target.style.transitionDelay = `${index * 350}ms`; // 300ms delay per item
+          }
+          entry.target.classList.add('visible'); // Add the visible class
+          observer.unobserve(entry.target); // Stop observing once it is visible
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    docItems.forEach(item => {
+      observer.observe(item); // Observe each documentation item
+    });
+
+    // Observe the contribution card for animation
+    observer.observe(contributionCard);
+
+    const text = "TechDox.io"; // The text to display
+    let index = 0; // Current index of the text
+
+    function typeWriter() {
+      if (index < text.length) {
+        document.getElementById("typewriter").innerHTML += text.charAt(index);
+        index++;
+      }
+      setTimeout(typeWriter, 350); // Adjust the speed of typing here
+    }
+
+    // Start the typewriter effect when the page loads
+    window.onload = typeWriter;
+
+    function updateCounter() {
+      const docs = document.querySelectorAll('.doc-item');
+      const visibleDocs = Array.from(docs).filter(doc => doc.style.display !== 'none');
+      document.getElementById('totalCount').textContent = visibleDocs.length;
+    }
+
+    // Call updateCounter after showing or hiding documentation items
+    function viewAllDocs() {
+      const hiddenDocs = document.querySelectorAll('.doc-item.hidden');
+      hiddenDocs.forEach(doc => {
+        doc.classList.remove('hidden'); // Show hidden documentation cards
+      });
+      document.getElementById('viewAllDocs').style.display = 'none'; // Hide the "View All Docs" button
+      document.getElementById('viewLessDocs').style.display = 'inline-block'; // Show the "View Less" button
+      updateCounter(); // Update the counter
+    }
+
+    function viewLessDocs() {
+      const allDocs = document.querySelectorAll('.doc-item');
+      allDocs.forEach((doc, index) => {
+        if (index >= 6) {
+          doc.classList.add('hidden'); // Hide additional documentation cards
+        }
+      });
+      document.getElementById('viewAllDocs').style.display = 'inline-block'; // Show the "View All Docs" button
+      document.getElementById('viewLessDocs').style.display = 'none'; // Hide the "View Less" button
+      updateCounter(); // Update the counter
+    }
+
+    // Initially hide all documentation items except the first 6 and update the counter
+    const docs = document.querySelectorAll('.doc-item');
+    docs.forEach((doc, index) => {
+      if (index >= 10) {
+        doc.classList.add('hidden'); // Hide additional documentation cards
+      }
+    });
+    updateCounter(); // Update the counter on page load
+  </script>
+
+</body>
+</html>
